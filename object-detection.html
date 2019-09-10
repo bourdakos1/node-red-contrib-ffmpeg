@@ -5,12 +5,10 @@
     icon: 'image.svg',
     defaults: {
       name: { value: '' },
-      path: { value: 'model_web' }
+      path: { value: '/' }
     },
-    inputs: 1,
-    outputs: 1,
-    inputLabels: 'base64 encoded image',
-    outputLabels: 'list of detected objects',
+    inputs: 0,
+    outputs: 0,
     label: () => {
       return this.name || 'object-detection'
     }

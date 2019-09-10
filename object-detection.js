@@ -1,7 +1,18 @@
-const fs = require('fs')
 const path = require('path')
-const tf = require('@tensorflow/tfjs-node')
-const { createCanvas, Image } = require('canvas')
+const { spawn } = require('child_process')
+
+const ws = require('ws')
+const express = require('express')
+const app = express()
+
+// path to accept the incoming MPEG-TS stream
+const TELLO_VIDEO_PORT = 11111
+const TELLO_HOST = '192.168.10.1'
+
+const HOST = 'localhost'
+const PORT =  3000 
+
+
 
 module.exports = RED => {
   function ObjectDetectionNode(config) {
@@ -11,59 +22,52 @@ module.exports = RED => {
 
     node.status({ fill: 'grey', shape: 'ring', text: 'model loading...' })
 
-    const labels = (() => {
-      try {
-        return JSON.parse(fs.readFileSync(path.join(node.path, LABELS_JSON)))
-      } catch (e) {
-        node.status({
-          fill: 'yellow',
-          shape: 'ring',
-          text: 'failed to load labels'
-        })
-      }
-    })()
+    app.post(`/tellostream`, (req, res) => {
+      res.connection.setTimeout(0)
 
-    const handler = tf.io.fileSystem(path.join(node.path, MODEL_JSON))
-    const modelPromise = tf.loadGraphModel(handler)
-
-    modelPromise
-      .then(() => {
-        if (labels) {
-          node.status({ fill: 'green', shape: 'dot', text: 'model ready' })
-        } else {
-          node.status({
-            fill: 'yellow',
-            shape: 'dot',
-            text: 'failed to load labels'
-          })
-        }
-      })
-      .catch(() => {
-        node.status({
-          fill: 'red',
-          shape: 'dot',
-          text: 'failed to load model'
-        })
+      req.on('data', function(data) {
+        wsServer.broadcast(data)
       })
 
-    node.on('input', msg => {
-      const canvas = createCanvas(300, 300)
-      const ctx = canvas.getContext('2d')
-      const img = new Image()
-      img.onload = async () => {
-        ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
-        const model = TFWrapper(await modelPromise, labels)
-        model.detect(canvas).then(predictions => {
-          predictions = predictions.map(prediction => ({
-            ...prediction,
-            bbox: prediction.bbox.map(c => c / canvas.width) // normalize coordinates.
-          }))
-          msg.payload = predictions
-          node.send(msg)
-        })
-      }
-      img.src = `data:image/jpg;base64,${msg.payload}`
+    }) 
+    // HTTP Server to accept incoming MPEG-TS Stream
+    const server = app.listen(PORT, HOST, () => {
+      const host = server.address().address
+      const port = server.address().port
+      console.log(`Server started at http://${host}:${port}/`)
     })
-  }
-  RED.nodes.registerType('object-detection', ObjectDetectionNode)
+
+// Websocket Server to send video data
+const wsServer = new ws.Server({ server: server })
+
+wsServer.broadcast = function(data) {
+  wsServer.clients.forEach(function each(client) {
+    if (client.readyState === ws.OPEN) {
+      client.send(data)
+    }
+  })
+}
+
+const ffmpeg = spawn('ffmpeg', [
+  '-hide_banner',
+  '-i',
+  `udp://${TELLO_HOST}:${TELLO_VIDEO_PORT}`,
+  '-f',
+  'mpegts',
+  '-codec:v',
+  'mpeg1video',
+  '-s',
+  '640x480',
+  '-b:v',
+  '800k',
+  '-bf',
+  '0',
+  '-r',
+  '20',
+  `http://${HOST}:${PORT}/tellostream`
+  ])
+
+}
+
+RED.nodes.registerType('object-detection', ObjectDetectionNode)
 }
