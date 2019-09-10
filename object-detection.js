@@ -13,7 +13,9 @@ module.exports = RED => {
     this.path = config.path
     const node = this
 
-    console.log(RED.nodes)
+    RED.nodes.eachNode(callback => {
+      console.log(callback)
+    })
 
     node.status({ fill: 'grey', shape: 'ring', text: 'model loading...' })
 
