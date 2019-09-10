@@ -1,8 +1,8 @@
 <script type="text/javascript">
-  RED.nodes.registerType('object-detection', {
-    category: 'Machine Learning',
-    color: '#f987ee',
-    icon: 'image.svg',
+  RED.nodes.registerType('ffmpeg-stream', {
+    category: 'Video Streaming',
+    color: '#fcb85c',
+    icon: 'Ffmpeg.svg',
     defaults: {
       name: { value: '' },
       path: { value: '/' }
@@ -10,12 +10,12 @@
     inputs: 0,
     outputs: 0,
     label: () => {
-      return this.name || 'object-detection'
+      return this.name || 'ffmpeg-stream'
     }
   })
 </script>
 
-<script type="text/x-red" data-template-name="object-detection">
+<script type="text/x-red" data-template-name="ffmpeg-stream">
   <div class="form-row">
     <label for="node-input-name"><i class="icon-tag"></i> Name</label>
     <input type="text" id="node-input-name" placeholder="Name">
@@ -26,7 +26,7 @@
   </div>
 </script>
 
-<script type="text/x-red" data-help-name="object-detection">
+<script type="text/x-red" data-help-name="ffmpeg-stream">
       <p>Detects objects in an image.</p>
 
       <h3>Inputs</h3>
