@@ -16,9 +16,9 @@ module.exports = RED => {
   function ObjectDetectionNode(config) {
     RED.nodes.createNode(this, config)
     this.path = config.path
-    this.server = n.client ? n.client : n.server
+    // this.server = config.client ? config.client : config.server
     const node = this
-    this.serverConfig = RED.nodes.getNode(this.server)
+    this.serverConfig = RED.nodes.getNode('websocket.connectto')
 
     console.log(RED.httpNode)
     console.log(this.server)
