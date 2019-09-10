@@ -1,0 +1,66 @@
+<script type="text/javascript">
+  RED.nodes.registerType('object-detection', {
+    category: 'Machine Learning',
+    color: '#f987ee',
+    icon: 'image.svg',
+    defaults: {
+      name: { value: '' },
+      path: { value: 'model_web' }
+    },
+    inputs: 1,
+    outputs: 1,
+    inputLabels: 'base64 encoded image',
+    outputLabels: 'list of detected objects',
+    label: () => {
+      return this.name || 'object-detection'
+    }
+  })
+</script>
+
+<script type="text/x-red" data-template-name="object-detection">
+  <div class="form-row">
+    <label for="node-input-name"><i class="icon-tag"></i> Name</label>
+    <input type="text" id="node-input-name" placeholder="Name">
+  </div>
+  <div class="form-row">
+    <label for="node-input-path"><i class="icon-tag"></i> Model</label>
+    <input type="text" id="node-input-path" placeholder="Path">
+  </div>
+</script>
+
+<script type="text/x-red" data-help-name="object-detection">
+      <p>Detects objects in an image.</p>
+
+      <h3>Inputs</h3>
+          <dl class="message-properties">
+              <dt>payload
+                  <span class="property-type">string</span>
+              </dt>
+              <dd>the base64 encoded string of the image.</dd>
+          </dl>
+
+       <h3>Outputs</h3>
+
+                   <dl class="message-properties">
+                       <dt>payload <span class="property-type">list</span></dt>
+                       <dd>a list of bounding boxes with their confidence score and class label.<br/>
+                         <code>
+  [<br/>
+  &nbsp;&nbsp;{<br/>
+  &nbsp;&nbsp;&nbsp;&nbsp;bbox: [x, y, width, height],<br/>
+  &nbsp;&nbsp;&nbsp;&nbsp;class: string,<br/>
+  &nbsp;&nbsp;&nbsp;&nbsp;score: float<br/>
+  &nbsp;&nbsp;},<br/>
+  &nbsp;&nbsp;...<br/>
+  ]
+                       </code>
+                      </dd>
+                   </dl>
+
+      <h3>Details</h3>
+
+      <h3>References</h3>
+          <ul>
+              <li><a>GitHub</a> - the nodes github repository</li>
+          </ul>
+</script>
