@@ -1,28 +1,19 @@
-// const path = require('path')
-const { spawn } = require('child_process')
-
-// const ws = require('ws')
-// const express = require('express')
-// const app = express()
-
-// path to accept the incoming MPEG-TS stream
-const TELLO_VIDEO_PORT = 11111
-const TELLO_HOST = '192.168.10.1'
-
-const HOST = 'localhost'
-const PORT = 3000
-
 module.exports = RED => {
+  const { spawn } = require('child_process')
+  const ws = require('ws')
+
+  const TELLO_VIDEO_PORT = 11111
+  const TELLO_HOST = '192.168.10.1'
+
+  const HOST = 'localhost'
+  const PORT = 1880
+
   function ObjectDetectionNode(config) {
     RED.nodes.createNode(this, config)
     this.path = config.path
-    // this.server = config.client ? config.client : config.server
     const node = this
-    this.serverConfig = RED.nodes.getNode('websocket.connectto')
 
-    console.log(RED.httpNode)
-    console.log(this.server)
-    console.log(this.serverConfig)
+    console.log(RED.nodes)
 
     node.status({ fill: 'grey', shape: 'ring', text: 'model loading...' })
 
