@@ -188,47 +188,26 @@ module.exports = RED => {
     ////////////////////////////////////////////////////////////////////////////
 
     function handleConnection(/*socket*/ socket) {
+      console.log('Client has been connected')
       var id = (1 + Math.random() * 4294967295).toString(16)
-      if (node.isServer) {
-        node._clients[id] = socket
-        node.emit('opened', {
+      node._clients[id] = socket
+      node.emit('opened', {
+        count: Object.keys(node._clients).length,
+        id: id
+      })
+
+      socket.on('close', function() {
+        delete node._clients[id]
+        node.emit('closed', {
           count: Object.keys(node._clients).length,
           id: id
         })
-      }
-      socket.on('open', function() {
-        if (!node.isServer) {
-          node.emit('opened', { count: '', id: id })
-        }
-      })
-      socket.on('close', function() {
-        if (node.isServer) {
-          delete node._clients[id]
-          node.emit('closed', {
-            count: Object.keys(node._clients).length,
-            id: id
-          })
-        } else {
-          node.emit('closed', { count: '', id: id })
-        }
-        if (!node.closing && !node.isServer) {
-          clearTimeout(node.tout)
-          node.tout = setTimeout(function() {
-            startconn()
-          }, 3000) // try to reconnect every 3 secs... bit fast ?
-        }
       })
       socket.on('message', function(data, flags) {
         node.handleEvent(id, socket, 'message', data, flags)
       })
       socket.on('error', function(err) {
         node.emit('erro', { err: err, id: id })
-        if (!node.closing && !node.isServer) {
-          clearTimeout(node.tout)
-          node.tout = setTimeout(function() {
-            startconn()
-          }, 3000) // try to reconnect every 3 secs... bit fast ?
-        }
       })
     }
 
@@ -295,14 +274,10 @@ module.exports = RED => {
 
   ObjectDetectionNode.prototype.broadcast = function(data) {
     try {
-      if (this.isServer) {
-        for (let client in this._clients) {
-          if (this._clients.hasOwnProperty(client)) {
-            this._clients[client].send(data)
-          }
+      for (let client in this._clients) {
+        if (this._clients.hasOwnProperty(client)) {
+          this._clients[client].send(data)
         }
-      } else {
-        this.server.send(data)
       }
     } catch (e) {
       // swallow any errors
