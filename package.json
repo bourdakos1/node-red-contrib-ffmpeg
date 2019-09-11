@@ -11,7 +11,7 @@
   ],
   "node-red": {
     "nodes": {
-      "object-detection": "object-detection.js"
+      "ffmpeg-stream": "ffmpeg-stream.js"
     }
   },
   "dependencies": {

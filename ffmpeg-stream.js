@@ -67,5 +67,5 @@ module.exports = RED => {
     ])
   }
 
-  RED.nodes.registerType('object-detection', ObjectDetectionNode)
+  RED.nodes.registerType('ffmpeg-stream', ObjectDetectionNode)
 }
