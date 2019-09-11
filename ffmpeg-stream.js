@@ -164,7 +164,7 @@ module.exports = RED => {
     })
   }
 
-  RED.nodes.registerType('websocket-client', WebSocketListenerNode)
+  RED.nodes.registerType('websocket-client2', WebSocketListenerNode)
 
   WebSocketListenerNode.prototype.registerInputNode = function(
     /*Node*/ handler
@@ -238,7 +238,7 @@ module.exports = RED => {
     this.path = config.path
     const node = this
 
-    this.serverConfig = RED.nodes.getNode('websocket-client')
+    this.serverConfig = RED.nodes.getNode('websocket-client2')
     console.log(this.serverConfig)
 
     node.status({ fill: 'grey', shape: 'ring', text: 'model loading...' })
