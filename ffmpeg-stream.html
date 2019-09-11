@@ -2,10 +2,10 @@
   RED.nodes.registerType('ffmpeg-stream', {
     category: 'Video Streaming',
     color: '#5cb85c',
-    icon: 'Ffmpeg.svg',
+    icon: 'ffmpeg.svg',
     defaults: {
       name: { value: '' },
-      path: { value: '/' }
+      path: { value: '' }
     },
     inputs: 0,
     outputs: 0,
@@ -20,8 +20,9 @@
     <label for="node-input-name"><i class="icon-tag"></i> Name</label>
     <input type="text" id="node-input-name" placeholder="Name">
   </div>
+
   <div class="form-row">
-    <label for="node-input-path"><i class="icon-tag"></i> Model</label>
+    <label for="node-input-path"><i class="icon-tag"></i> Path</label>
     <input type="text" id="node-input-path" placeholder="Path">
   </div>
 </script>
