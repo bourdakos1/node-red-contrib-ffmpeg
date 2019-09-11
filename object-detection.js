@@ -13,9 +13,8 @@ module.exports = RED => {
     this.path = config.path
     const node = this
 
-    RED.nodes.eachNode(callback => {
-      console.log(callback)
-    })
+    this.serverConfig = RED.nodes.getNode('websocket-listener')
+    console.log(this.serverConfig)
 
     node.status({ fill: 'grey', shape: 'ring', text: 'model loading...' })
 
