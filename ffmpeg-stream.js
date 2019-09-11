@@ -187,6 +187,13 @@ module.exports = RED => {
 
     ////////////////////////////////////////////////////////////////////////////
 
+    // node._inputNodes = [] // collection of nodes that want to receive events
+    node._clients = {}
+    // match absolute url
+    // node.isServer = !/^ws{1,2}:\/\//i.test(node.path)
+    // node.closing = false
+    // node.tls = n.tls
+
     function handleConnection(/*socket*/ socket) {
       console.log('Client has been connected')
       var id = (1 + Math.random() * 4294967295).toString(16)
@@ -223,7 +230,7 @@ module.exports = RED => {
       (node.path.charAt(0) == '/' ? node.path.substring(1) : node.path)
     node.fullPath = path
 
-    console.log(node.fullPath)
+    // console.log(node.fullPath)
 
     if (listenerNodes.hasOwnProperty(path)) {
       node.error(RED._('websocket.errors.duplicate-path', { path: node.path }))
