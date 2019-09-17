@@ -30,11 +30,10 @@ module.exports = RED => {
 
   function ObjectDetectionNode(config) {
     RED.nodes.createNode(this, config)
-    this.path = config.path || generateUUID()
     const node = this
 
     node.status({ fill: 'grey', shape: 'ring', text: 'waiting' })
-
+    node.path = generateUUID()
     node._clients = {}
 
     if (!serverUpgradeAdded) {
@@ -63,10 +62,10 @@ module.exports = RED => {
       (basePath.endsWith('/') ? '' : '/') + // ensure base path ends with `/`
       (node.path.startsWith('/') ? node.path.substring(1) : node.path) // If the first character is `/` remove it.
 
-    // setInterval(() => {
-    //   // TODO: This is super hacky...
-    //   node.send({ payload: `ws://${HOST}:${PORT}${node.fullPath}` })
-    // }, 500)
+    setInterval(() => {
+      // TODO: This is super hacky...
+      node.send({ payload: `ws://${HOST}:${PORT}${node.fullPath}` })
+    }, 500)
 
     if (listenerNodes.hasOwnProperty(node.fullPath)) {
       node.error(RED._('websocket.errors.duplicate-path', { path: node.path }))
@@ -100,6 +99,11 @@ module.exports = RED => {
     node.on('close', () => {
       delete listenerNodes[node.fullPath]
       node.server.close()
+      console.log('closing node and killing ffmpeg')
+      node.ffmpeg.stderr.pause()
+      node.ffmpeg.stdout.pause()
+      node.ffmpeg.stdin.pause()
+      node.ffmpeg.kill()
     })
 
     RED.httpNode.post(`/${STREAM}`, (req, res) => {
@@ -129,34 +133,35 @@ module.exports = RED => {
       })
     })
 
-    node.on('input', () => {
-      if (node.ffmpeg) {
-        console.log('killing ffmpeg')
-        node.ffmpeg.stderr.pause()
-        node.ffmpeg.stdout.pause()
-        node.ffmpeg.stdin.pause()
-        node.ffmpeg.kill()
-      }
-      console.log('starting ffmpeg')
-      node.ffmpeg = spawn('ffmpeg', [
-        '-hide_banner',
-        '-i',
-        `udp://${TELLO_HOST}:${TELLO_VIDEO_PORT}`,
-        '-f',
-        'mpegts',
-        '-codec:v',
-        'mpeg1video',
-        '-s',
-        '640x480',
-        '-b:v',
-        '800k',
-        '-bf',
-        '0',
-        '-r',
-        '20',
-        `http://${HOST}:${PORT}/${STREAM}`
-      ])
-      node.send({ payload: `ws://${HOST}:${PORT}${node.fullPath}` })
+    // node.on('input', () => {
+    if (node.ffmpeg) {
+      console.log('killing ffmpeg')
+      node.ffmpeg.stderr.pause()
+      node.ffmpeg.stdout.pause()
+      node.ffmpeg.stdin.pause()
+      node.ffmpeg.kill()
+    }
+    console.log('starting ffmpeg')
+    node.ffmpeg = spawn('ffmpeg', [
+      '-hide_banner',
+      '-i',
+      `udp://${TELLO_HOST}:${TELLO_VIDEO_PORT}`,
+      '-f',
+      'mpegts',
+      '-codec:v',
+      'mpeg1video',
+      '-s',
+      '640x480',
+      '-b:v',
+      '800k',
+      '-bf',
+      '0',
+      '-r',
+      '20',
+      `http://${HOST}:${PORT}/${STREAM}`
+    ])
+    node.ffmpeg.stderr.on('data', data => {
+      console.log(`${data}`)
     })
   }
 

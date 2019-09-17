@@ -4,10 +4,9 @@
     color: '#5cb85c',
     icon: 'ffmpeg.svg',
     defaults: {
-      name: { value: '' },
-      path: { value: undefined }
+      name: { value: '' }
     },
-    inputs: 1,
+    inputs: 0,
     outputs: 1,
     label: () => {
       return this.name || 'ffmpeg-stream'
@@ -19,10 +18,5 @@
   <div class="form-row">
     <label for="node-input-name"><i class="icon-tag"></i> Name</label>
     <input type="text" id="node-input-name" placeholder="Name">
-  </div>
-
-  <div class="form-row">
-    <label for="node-input-path"><i class="icon-tag"></i> Path</label>
-    <input type="text" id="node-input-path" placeholder="Path">
   </div>
 </script>
