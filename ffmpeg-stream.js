@@ -32,7 +32,7 @@ module.exports = RED => {
     RED.nodes.createNode(this, config)
     const node = this
 
-    node.status({ fill: 'grey', shape: 'ring', text: 'waiting' })
+    node.status({ fill: 'grey', shape: 'ring', text: 'waiting...' })
     node.path = generateUUID()
     node._clients = {}
 
@@ -83,11 +83,6 @@ module.exports = RED => {
     node.server = new ws.Server(serverOptions)
     node.server.setMaxListeners(0)
     node.server.on('connection', socket => {
-      node.status({
-        fill: 'grey',
-        shape: 'ring',
-        text: 'connected & waiting for stream'
-      })
       const id = generateUUID()
       node._clients[id] = socket
 
@@ -99,7 +94,6 @@ module.exports = RED => {
     node.on('close', () => {
       delete listenerNodes[node.fullPath]
       node.server.close()
-      console.log('closing node and killing ffmpeg')
       node.ffmpeg.stderr.pause()
       node.ffmpeg.stdout.pause()
       node.ffmpeg.stdin.pause()
@@ -114,7 +108,7 @@ module.exports = RED => {
             node.status({
               fill: 'grey',
               shape: 'ring',
-              text: 'streaming & waiting to connect'
+              text: 'streaming'
             })
           }
           for (let client in this._clients) {
@@ -122,7 +116,7 @@ module.exports = RED => {
               node.status({
                 fill: 'green',
                 shape: 'dot',
-                text: 'connected & streaming'
+                text: 'streaming'
               })
               this._clients[client].send(data)
             }
@@ -133,15 +127,13 @@ module.exports = RED => {
       })
     })
 
-    // node.on('input', () => {
     if (node.ffmpeg) {
-      console.log('killing ffmpeg')
       node.ffmpeg.stderr.pause()
       node.ffmpeg.stdout.pause()
       node.ffmpeg.stdin.pause()
       node.ffmpeg.kill()
     }
-    console.log('starting ffmpeg')
+
     node.ffmpeg = spawn('ffmpeg', [
       '-hide_banner',
       '-i',
