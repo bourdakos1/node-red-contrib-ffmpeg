@@ -21,7 +21,7 @@ module.exports = RED => {
   const TELLO_VIDEO_PORT = 11111
   const TELLO_HOST = '192.168.10.1'
 
-  const HOST = 'localhost'
+  const HOST = '0.0.0.0'
   const PORT = RED.settings.uiPort
   const STREAM = generateUUID()
 
@@ -30,6 +30,7 @@ module.exports = RED => {
 
   function ObjectDetectionNode(config) {
     RED.nodes.createNode(this, config)
+    this.deviceType = config.devicetype
     const node = this
 
     node.status({ fill: 'grey', shape: 'ring', text: 'waiting...' })
@@ -134,10 +135,19 @@ module.exports = RED => {
       node.ffmpeg.kill()
     }
 
+    switch (node.deviceType) {
+      case 'tello':
+        node.deviceInput = `udp://${TELLO_HOST}:${TELLO_VIDEO_PORT}`
+        break
+      case 'raspi':
+        node.deviceInput = '/dev/video0'
+        break
+    }
+
     node.ffmpeg = spawn('ffmpeg', [
       '-hide_banner',
       '-i',
-      `udp://${TELLO_HOST}:${TELLO_VIDEO_PORT}`,
+      node.deviceInput,
       '-f',
       'mpegts',
       '-codec:v',
