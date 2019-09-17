@@ -1,3 +1,18 @@
+function generateUUID() {
+  var d = new Date().getTime()
+  if (Date.now) {
+    d = Date.now() //high-precision timer
+  }
+  var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(
+    c
+  ) {
+    var r = (d + Math.random() * 16) % 16 | 0
+    d = Math.floor(d / 16)
+    return (c === 'x' ? r : (r & 0x3) | 0x8).toString(16)
+  })
+  return uuid
+}
+
 module.exports = RED => {
   const { spawn } = require('child_process')
   const ws = require('ws')
@@ -8,14 +23,14 @@ module.exports = RED => {
 
   const HOST = 'localhost'
   const PORT = RED.settings.uiPort
-  const STREAM = `stream_${(1 + Math.random() * 4294967295).toString(16)}`
+  const STREAM = generateUUID()
 
   let serverUpgradeAdded = false
   let listenerNodes = {}
 
   function ObjectDetectionNode(config) {
     RED.nodes.createNode(this, config)
-    this.path = config.path
+    this.path = config.path || generateUUID()
     const node = this
 
     node.status({ fill: 'grey', shape: 'ring', text: 'waiting' })
@@ -48,11 +63,17 @@ module.exports = RED => {
       (basePath.endsWith('/') ? '' : '/') + // ensure base path ends with `/`
       (node.path.startsWith('/') ? node.path.substring(1) : node.path) // If the first character is `/` remove it.
 
-    if (listenerNodes.hasOwnProperty(path)) {
+    // setInterval(() => {
+    //   // TODO: This is super hacky...
+    //   node.send({ payload: `ws://${HOST}:${PORT}${node.fullPath}` })
+    // }, 500)
+
+    if (listenerNodes.hasOwnProperty(node.fullPath)) {
       node.error(RED._('websocket.errors.duplicate-path', { path: node.path }))
       return
     }
     listenerNodes[node.fullPath] = node
+
     const serverOptions = {
       noServer: true
     }
@@ -68,7 +89,7 @@ module.exports = RED => {
         shape: 'ring',
         text: 'connected & waiting for stream'
       })
-      const id = (1 + Math.random() * 4294967295).toString(16)
+      const id = generateUUID()
       node._clients[id] = socket
 
       socket.on('close', () => {
@@ -108,24 +129,35 @@ module.exports = RED => {
       })
     })
 
-    spawn('ffmpeg', [
-      '-hide_banner',
-      '-i',
-      `udp://${TELLO_HOST}:${TELLO_VIDEO_PORT}`,
-      '-f',
-      'mpegts',
-      '-codec:v',
-      'mpeg1video',
-      '-s',
-      '640x480',
-      '-b:v',
-      '800k',
-      '-bf',
-      '0',
-      '-r',
-      '20',
-      `http://${HOST}:${PORT}/${STREAM}`
-    ])
+    node.on('input', () => {
+      if (node.ffmpeg) {
+        console.log('killing ffmpeg')
+        node.ffmpeg.stderr.pause()
+        node.ffmpeg.stdout.pause()
+        node.ffmpeg.stdin.pause()
+        node.ffmpeg.kill()
+      }
+      console.log('starting ffmpeg')
+      node.ffmpeg = spawn('ffmpeg', [
+        '-hide_banner',
+        '-i',
+        `udp://${TELLO_HOST}:${TELLO_VIDEO_PORT}`,
+        '-f',
+        'mpegts',
+        '-codec:v',
+        'mpeg1video',
+        '-s',
+        '640x480',
+        '-b:v',
+        '800k',
+        '-bf',
+        '0',
+        '-r',
+        '20',
+        `http://${HOST}:${PORT}/${STREAM}`
+      ])
+      node.send({ payload: `ws://${HOST}:${PORT}${node.fullPath}` })
+    })
   }
 
   RED.nodes.registerType('ffmpeg-stream', ObjectDetectionNode)
