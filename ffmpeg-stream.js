@@ -33,9 +33,39 @@ module.exports = RED => {
     this.deviceType = config.devicetype
     const node = this
 
-    node.status({ fill: 'grey', shape: 'ring', text: 'waiting...' })
     node.path = generateUUID()
-    node._clients = {}
+    node.clients = {}
+    node.isStreaming = false
+
+    function displayStatus() {
+      const RING = 'ring'
+      const DOT = 'dot'
+      const GREY = 'grey'
+      const GREEN = 'green'
+
+      let color
+      let shape
+      let message
+
+      const numberOfClient = Object.keys(node.clients).length
+
+      if (numberOfClient > 0 && node.isStreaming) {
+        color = GREEN
+        shape = DOT
+      } else {
+        color = GREY
+        shape = RING
+      }
+
+      if (node.isStreaming) {
+        message = `streaming—${numberOfClient} connected`
+      } else {
+        message = `waiting to stream—${numberOfClient} connected`
+      }
+
+      node.status({ fill: color, shape: shape, text: message })
+    }
+    displayStatus()
 
     if (!serverUpgradeAdded) {
       RED.server.on('upgrade', (request, socket, head) => {
@@ -63,10 +93,12 @@ module.exports = RED => {
       (basePath.endsWith('/') ? '' : '/') + // ensure base path ends with `/`
       (node.path.startsWith('/') ? node.path.substring(1) : node.path) // If the first character is `/` remove it.
 
-    setInterval(() => {
-      // TODO: This is super hacky...
-      node.send({ payload: `ws://${HOST}:${PORT}${node.fullPath}` })
-    }, 500)
+    setTimeout(() => {
+      node.send({
+        payload: `:${PORT}${node.fullPath}`
+      })
+      displayStatus()
+    }, 100)
 
     if (listenerNodes.hasOwnProperty(node.fullPath)) {
       node.error(RED._('websocket.errors.duplicate-path', { path: node.path }))
@@ -85,10 +117,12 @@ module.exports = RED => {
     node.server.setMaxListeners(0)
     node.server.on('connection', socket => {
       const id = generateUUID()
-      node._clients[id] = socket
+      node.clients[id] = socket
+      displayStatus()
 
       socket.on('close', () => {
-        delete node._clients[id]
+        delete node.clients[id]
+        displayStatus()
       })
     })
 
@@ -104,22 +138,11 @@ module.exports = RED => {
     RED.httpNode.post(`/${STREAM}`, (req, res) => {
       res.connection.setTimeout(0)
       req.on('data', data => {
+        displayStatus()
         try {
-          if (Object.keys(this._clients).length === 0) {
-            node.status({
-              fill: 'grey',
-              shape: 'ring',
-              text: 'streaming'
-            })
-          }
-          for (let client in this._clients) {
-            if (this._clients.hasOwnProperty(client)) {
-              node.status({
-                fill: 'green',
-                shape: 'dot',
-                text: 'streaming'
-              })
-              this._clients[client].send(data)
+          for (let client in node.clients) {
+            if (node.clients.hasOwnProperty(client)) {
+              node.clients[client].send(data)
             }
           }
         } catch (e) {
@@ -137,31 +160,54 @@ module.exports = RED => {
 
     switch (node.deviceType) {
       case 'tello':
-        node.deviceInput = `udp://${TELLO_HOST}:${TELLO_VIDEO_PORT}`
+        node.ffmpeg = spawn('ffmpeg', [
+          '-hide_banner',
+          '-i',
+          `udp://${TELLO_HOST}:${TELLO_VIDEO_PORT}`,
+          '-f',
+          'mpegts',
+          '-codec:v',
+          'mpeg1video',
+          '-s',
+          '640x480',
+          '-b:v',
+          '800k',
+          '-bf',
+          '0',
+          '-r',
+          '20',
+          `http://${HOST}:${PORT}/${STREAM}`
+        ])
         break
       case 'raspi':
-        node.deviceInput = '/dev/video0'
+        node.ffmpeg = spawn('ffmpeg', [
+          '-hide_banner',
+          '-f',
+          'v4l2',
+          '-framerate',
+          '25',
+          '-video_size',
+          '640x640',
+          '-i',
+          '/dev/video0',
+          '-f',
+          'mpegts',
+          '-codec:v',
+          'mpeg1video',
+          '-s',
+          '640x640',
+          // '1280x720',
+          '-b:v',
+          '10m',
+          '-bf',
+          '0',
+          '-q',
+          '4', // 1 to 31
+          `http://${HOST}:${PORT}/${STREAM}`
+        ])
         break
     }
 
-    node.ffmpeg = spawn('ffmpeg', [
-      '-hide_banner',
-      '-i',
-      node.deviceInput,
-      '-f',
-      'mpegts',
-      '-codec:v',
-      'mpeg1video',
-      '-s',
-      '640x480',
-      '-b:v',
-      '800k',
-      '-bf',
-      '0',
-      '-r',
-      '20',
-      `http://${HOST}:${PORT}/${STREAM}`
-    ])
     node.ffmpeg.stderr.on('data', data => {
       console.log(`${data}`)
     })
