@@ -128,6 +128,18 @@ module.exports = RED => {
 
     node.on('close', () => {
       delete listenerNodes[node.fullPath]
+
+      // Don't know if this does anything...
+      RED.httpNode._router.stack.forEach((route, i, routes) => {
+        if (
+          route.route &&
+          route.route.path === `/${STREAM}` &&
+          route.route.methods['post']
+        ) {
+          routes.splice(i, 1)
+        }
+      })
+
       node.server.close()
       node.ffmpeg.stderr.pause()
       node.ffmpeg.stdout.pause()
@@ -187,7 +199,7 @@ module.exports = RED => {
           '0',
           '-r',
           '20',
-          `http://${HOST}:${PORT}/${STREAM}`
+          `http://${HOST}:${PORT}${basePath}${STREAM}`
         ])
         break
       case 'raspi':
@@ -214,7 +226,7 @@ module.exports = RED => {
           '0',
           '-q',
           '4', // 1 to 31
-          `http://${HOST}:${PORT}/${STREAM}`
+          `http://${HOST}:${PORT}${basePath}${STREAM}`
         ])
         break
     }
