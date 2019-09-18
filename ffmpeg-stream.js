@@ -137,7 +137,18 @@ module.exports = RED => {
 
     RED.httpNode.post(`/${STREAM}`, (req, res) => {
       res.connection.setTimeout(0)
+      let lastDataReceived
       req.on('data', data => {
+        if (lastDataReceived) {
+          clearTimeout(lastDataReceived)
+        }
+        lastDataReceived = setTimeout(() => {
+          // No data after 2 seconds, the stream has probably disconnected.
+          node.isStreaming = false
+          displayStatus()
+        }, 2000)
+
+        node.isStreaming = true
         displayStatus()
         try {
           for (let client in node.clients) {
