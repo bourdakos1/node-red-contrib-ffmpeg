@@ -31,9 +31,9 @@ module.exports = RED => {
   function ObjectDetectionNode(config) {
     RED.nodes.createNode(this, config)
     this.deviceType = config.devicetype
+    this.path = config.url
     const node = this
 
-    node.path = generateUUID()
     node.clients = {}
     node.isStreaming = false
 
@@ -92,13 +92,6 @@ module.exports = RED => {
       basePath +
       (basePath.endsWith('/') ? '' : '/') + // ensure base path ends with `/`
       (node.path.startsWith('/') ? node.path.substring(1) : node.path) // If the first character is `/` remove it.
-
-    setTimeout(() => {
-      node.send({
-        payload: `:${PORT}${node.fullPath}`
-      })
-      displayStatus()
-    }, 100)
 
     if (listenerNodes.hasOwnProperty(node.fullPath)) {
       node.error(RED._('websocket.errors.duplicate-path', { path: node.path }))

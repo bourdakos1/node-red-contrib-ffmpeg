@@ -4,27 +4,48 @@
     color: '#5cb85c',
     icon: 'ffmpeg.svg',
     defaults: {
-      name: { value: '' },
-      devicetype: { value: 'tello' }
+      devicetype: { value: 'tello' },
+      url: { required: true, value: '' },
+      name: { value: '' }
     },
     inputs: 0,
-    outputs: 1,
-    label: () => {
-      return this.name || 'ffmpeg-stream'
+    outputs: 0,
+    label: function() {
+      if (this.name) {
+        return this.name
+      }
+      if (this.url) {
+        const basePath = RED.settings.httpNodeRoot || '/'
+        const fullPath =
+          basePath +
+          (basePath.endsWith('/') ? '' : '/') + // ensure base path ends with `/`
+          (this.url.startsWith('/') ? this.url.substring(1) : this.url) // If the first character is `/` remove it.
+        return `${this.devicetype} ${fullPath}`
+      }
+      return 'ffmpeg-stream'
+    },
+    labelStyle: function() {
+      return this.name ? 'node_label_italic' : ''
     }
   })
 </script>
 
 <script type="text/x-red" data-template-name="ffmpeg-stream">
   <div class="form-row">
-    <label for="node-input-name"><i class="icon-tag"></i> Name</label>
-    <input type="text" id="node-input-name" placeholder="Name">
-  </div>
-  <div class="form-row">
     <label for="node-input-devicetype"><i class="icon-camera"></i> Device Type</label>
     <select id="node-input-devicetype">
       <option value="tello" selected="selected">Tello Drone</option>
       <option value="raspi">Raspberry Pi</option>
     </select>
+  </div>
+
+  <div class="form-row">
+    <label for="node-input-url"><i class="icon-globe"></i> URL</label>
+    <input type="text" id="node-input-url" placeholder="/url">
+  </div>
+
+  <div class="form-row">
+    <label for="node-input-name"><i class="icon-tag"></i> Name</label>
+    <input type="text" id="node-input-name" placeholder="Name">
   </div>
 </script>
