@@ -22,21 +22,13 @@ Open the node's configuration panel to set Device Type and the stream url.
 ```html
 <html>
   <body>
+    <script src="jsmpeg.min.js"></script>
     <canvas id="video-canvas"></canvas>
     <script>
-      const init = () => {
-        const videoCanvas = document.getElementById('video-canvas')
-        const url = `ws://${window.location.hostname}:${window.location.port}/stream`
-        new JSMpeg.Player(url, { canvas: videoCanvas })
-      }
-      
-      if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', init)
-      } else {
-        setTimeout(init, 500)
-      }
+      const videoCanvas = document.getElementById('video-canvas')
+      const url = `ws://${window.location.hostname}:${window.location.port}/stream`
+      new JSMpeg.Player(url, { canvas: videoCanvas })
     </script>
-    <script src="jsmpeg.min.js"></script>
   </body>
 </html>
 ```
