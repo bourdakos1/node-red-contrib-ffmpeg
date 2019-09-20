@@ -11,10 +11,10 @@ A simple ffmpeg wrapper for streaming video from a [DJI Tello Drone](https://www
 $ npm install node-red-contrib-ffmpeg
 ```
 
-> **Note:** This node requires that you have [ffmpeg](https://ffmpeg.org/) installed on your machine. Homebrew users `brew install ffmpeg`.
+> **Note:** This node requires that you have [ffmpeg](https://ffmpeg.org/) installed on your machine.
 
 ## Configure your node
-Open the node's configuration panel to set Device Type (Tello Drone or Raspberry Pi) and the stream url.
+Open the node's configuration panel to set Device Type and the stream url.
 ![](images/configure.png)
 > **Note:** In this example our stream will be accessible at `ws://<host>:<port>/stream`
 
@@ -37,7 +37,7 @@ sudo raspi-config
 
 Then use the arrow keys to choose _Interfacing Options_ > _Camera_ and select to enable the camera. Once the camera is enabled, reboot your Raspberry Pi.
 
-> **Note:** For most up-to-date instructions for Raspberry Pi Camera setup, check out the [official documentation](https://www.raspberrypi.org/documentation/configuration/camera.md).
+> **Note:** For the most up-to-date instructions for Raspberry Pi Camera setup, check out the [official documentation](https://www.raspberrypi.org/documentation/configuration/camera.md).
 
 The Raspberry Pi will start streaming as soon as you start node red.
 
