@@ -40,3 +40,7 @@ Then use the arrow keys to choose _Interfacing Options_ > _Camera_ and select to
 > **Note:** For most up-to-date instructions for Raspberry Pi Camera setup, check out the [official documentation](https://www.raspberrypi.org/documentation/configuration/camera.md).
 
 The Raspberry Pi will start streaming as soon as you start node red.
+
+## Authors
+- [Nicholas Bourdakos](https://github.com/bourdakos1)
+- [Pooja Mistry ](https://github.com/pmmistry)
