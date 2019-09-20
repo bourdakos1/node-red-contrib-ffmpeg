@@ -29,9 +29,10 @@ To render the video stream in the browser, we use a library called [JSMpeg](http
     <canvas id="video-canvas"></canvas>
     <script>
       const videoCanvas = document.getElementById('video-canvas')
+      
       // The stream URL that we set in the previous step.
       const url = `ws://${window.location.hostname}:${window.location.port}/stream`
-      // Initialize the player.
+
       new JSMpeg.Player(url, { canvas: videoCanvas })
     </script>
   </body>
