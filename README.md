@@ -18,6 +18,29 @@ Open the node's configuration panel to set Device Type and the stream url.
 ![](images/configure.png)
 > **Note:** In this example our stream will be accessible at `ws://<host>:<port>/stream`
 
+## Using the stream
+```html
+<html>
+  <body>
+    <canvas id="video-canvas"></canvas>
+    <script>
+      const init = () => {
+        const videoCanvas = document.getElementById('video-canvas')
+        const url = `ws://${window.location.hostname}:${window.location.port}/stream`
+        new JSMpeg.Player(url, { canvas: videoCanvas })
+      }
+      
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init)
+      } else {
+        setTimeout(init, 500)
+      }
+    </script>
+    <script src="jsmpeg.min.js"></script>
+  </body>
+</html>
+```
+
 ## Device specific instructions
 There are a few minor hardware specific steps depending on your device.
 
