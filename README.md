@@ -11,18 +11,11 @@ The [node-red-contrib-ffmpeg](https://flows.nodered.org/node/node-red-contrib-ff
 
 ## To get started with Tello Drone 
 - Install [Node-RED](https://github.com/johnwalicki/Node-RED-Tello-Control/blob/master/docs/PART2.md)
-- Install node-red-contrib-ffmpeg node : 
-    npm install node-red-contrib-ffmpeg
-- Install ffmpeg  ``brew install ffmpeg`
-
-
-    brew install ffmpeg 
-
-once installed run : 
-
-    ffmpeg 
-    output: 
-    ffmpeg version 4.1.4 Copyright (c) 2000-2019 the FFmpeg developers
+- Install node-red-contrib-ffmpeg node : `npm install node-red-contrib-ffmpeg` 
+- Install ffmpeg  `brew install ffmpeg`
+once installed run :  `ffmpeg `
+ output should be : 
+```ffmpeg version 4.1.4 Copyright (c) 2000-2019 the FFmpeg developers
       built with Apple LLVM version 10.0.1 (clang-1001.0.46.4)
       configuration: --prefix=/usr/local/Cellar/ffmpeg/4.1.4_2 --enable-shared --enable-pthreads --enable-version3 --enable-avresample --cc=clang --host-cflags='-I/Library/Java/JavaVirtualMachines/adoptopenjdk-12.0.1.jdk/Contents/Home/include -I/Library/Java/JavaVirtualMachines/adoptopenjdk-12.0.1.jdk/Contents/Home/include/darwin' --host-ldflags= --enable-ffplay --enable-gnutls --enable-gpl --enable-libaom --enable-libbluray --enable-libmp3lame --enable-libopus --enable-librubberband --enable-libsnappy --enable-libtesseract --enable-libtheora --enable-libvorbis --enable-libvpx --enable-libx264 --enable-libx265 --enable-libxvid --enable-lzma --enable-libfontconfig --enable-libfreetype --enable-frei0r --enable-libass --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libopenjpeg --enable-librtmp --enable-libspeex --enable-videotoolbox --disable-libjack --disable-indev=jack --enable-libaom --enable-libsoxr
       libavutil      56. 22.100 / 56. 22.100
@@ -35,7 +28,8 @@ once installed run :
       libswresample   3.  3.100 /  3.  3.100
       libpostproc    55.  3.100 / 55.  3.100
     Hyper fast Audio and Video encoder
-    usage: ffmpeg \[options\] [[infile options] -i infile]... {[outfile options] outfile}...
+    usage: ffmpeg \[options\] [[infile options] -i infile]... {[outfile options] outfile}... ``` 
+  
 - Run Node-RED locally `node-red`
 - Import [flow](https://github.com/bourdakos1/node-red-contrib-ffmpeg/blob/master/flows/tellodroneflow.json) 
 - Turn Tello Wifi on 
