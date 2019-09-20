@@ -87,3 +87,10 @@ ffmpeg-stream node should point to device type Raspberry Pi
 
 When you go to `http://127.0.0.1:1880/dashboard` you should see streaming output 
 
+### Authors
+
+- [Nicholas Bourdakos](https://github.com/bourdakos1)
+- [Pooja Mistry ](https://github.com/pmmistry)
+___
+
+Enjoy!  Give us feedback if you have suggestions on how to improve this tutorial.
