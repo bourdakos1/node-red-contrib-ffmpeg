@@ -37,7 +37,7 @@ usage: ffmpeg [options] [[infile options] -i infile]... {[outfile options] outfi
 - Turn Tello Wifi on 
 - Inject Command and then streamon in the flow 
 
-******Flow should look like this :** 
+**Flow should look like this :** 
 
 ![](https://paper-attachments.dropbox.com/s_4AE263202A5F2B1AAEA143CCE67F527ABF702C9E039F2D12D9A80F69EFFF67A1_1568854320998_Screen+Shot+2019-09-18+at+8.48.09+PM.png)
 
