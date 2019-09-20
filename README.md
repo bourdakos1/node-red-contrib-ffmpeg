@@ -15,7 +15,7 @@ $ npm install node-red-contrib-ffmpeg
 
 ## Configure your node
 Open the node's configuration panel to set Device Type (Tello Drone or Raspberry Pi) and the stream url.
-![](images/example.png)
+![](images/configure.png)
 > **Note:** In this example our stream will be accessible at `ws://<host>:<port>/stream`
 
 ## Device specific instructions
