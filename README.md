@@ -14,19 +14,24 @@ $ npm install node-red-contrib-ffmpeg
 > **Note:** This node requires that you have [ffmpeg](https://ffmpeg.org/) installed on your machine.
 
 ## Configure your node
-Open the node's configuration panel to set Device Type and the stream url.
+Open the node's configuration panel to set `Device Type` and the `Stream URL`.
 ![](images/configure.png)
 > **Note:** In this example our stream will be accessible at `ws://<host>:<port>/stream`
 
 ## Using the stream
+To render the video stream in the browser, we use a library called [JSMpeg](https://github.com/phoboslab/jsmpeg).
 ```html
 <html>
   <body>
+    <!-- import JSMpeg -->
     <script src="jsmpeg.min.js"></script>
+    <!-- create a canvas tag to render our video stream -->
     <canvas id="video-canvas"></canvas>
     <script>
       const videoCanvas = document.getElementById('video-canvas')
+      // The stream URL that we set in the previous step.
       const url = `ws://${window.location.hostname}:${window.location.port}/stream`
+      // Initialize the player.
       new JSMpeg.Player(url, { canvas: videoCanvas })
     </script>
   </body>
