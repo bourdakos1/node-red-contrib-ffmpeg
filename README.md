@@ -11,8 +11,8 @@ The [node-red-contrib-ffmpeg](https://flows.nodered.org/node/node-red-contrib-ff
 
 ## To get started with Tello Drone 
 - Install [Node-RED](https://github.com/johnwalicki/Node-RED-Tello-Control/blob/master/docs/PART2.md)
-- Install node-red-contrib-ffmpeg node : `npm install node-red-contrib-ffmpeg` 
-- Install ffmpeg  `brew install ffmpeg`
+- Install **node-red-contrib-ffmpeg**](https://flows.nodered.org/node/node-red-contrib-ffmpeg) : `npm install node-red-contrib-ffmpeg` 
+- Install [ffmpeg](https://ffmpeg.org/) `brew install ffmpeg`
 once installed run :  `ffmpeg `
  output should be : 
 ```
