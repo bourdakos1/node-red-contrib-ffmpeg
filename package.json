@@ -1,13 +1,17 @@
 {
   "name": "node-red-contrib-ffmpeg",
-  "version": "0.1.0",
-  "description": "A node for node-red that uses tensorflow.js to detect custom objects",
+  "version": "0.1.1",
+  "description": "A simple ffmpeg wrapper for streaming video in Node-RED",
   "license": "MIT",
   "scripts": {
     "start": "nodemon  --ext html,htm,js,json --exec \"node-red\""
   },
   "keywords": [
-    "node-red"
+    "node-red",
+    "tello-drone",
+    "video-stream",
+    "raspberry-pi",
+    "flow"
   ],
   "node-red": {
     "nodes": {
@@ -15,7 +19,6 @@
     }
   },
   "dependencies": {
-    "express": "^4.17.1",
     "ws": "^7.1.2"
   },
   "devDependencies": {
