@@ -50,7 +50,7 @@ In the example flow, to start the video stream, click the `command` command foll
 
 Check out this [blog post](https://dev.to/poojamakes/detecting-objects-with-a-tello-drone-38np) to get started
 
-9### Raspberry Pi
+### Raspberry Pi
 Before you can stream with a Raspberry Pi, you will need to attach a camera and enable it.
 
 To enable camera support, run the following command:
